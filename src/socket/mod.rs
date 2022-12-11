@@ -60,8 +60,8 @@ impl CanFrame {
                 }),
                 MessageType::Extended => Ok(CanFrame {
                     frame: pcan::TPCANMsg {
-                        ID: can_id & STANDARD_MASK,
-                        MSGTYPE: pcan::PCAN_MESSAGE_STANDARD as u8,
+                        ID: can_id & EXTENDED_MASK,
+                        MSGTYPE: pcan::PCAN_MESSAGE_EXTENDED as u8,
                         LEN: data.len() as u8,
                         DATA: frame_data,
                     },
@@ -71,7 +71,8 @@ impl CanFrame {
     }
 
     pub fn is_standard_frame(&self) -> bool {
-        self.frame.MSGTYPE & pcan::PCAN_MESSAGE_STANDARD as u8 != 0
+        // PCAN_MESSAGE_STANDARD flag is denoted as 0, so check for extended frame flag instead
+        !self.is_extended_frame()
     }
 
     pub fn is_extended_frame(&self) -> bool {
@@ -160,8 +161,8 @@ impl CanFdFrame {
                 }),
                 MessageType::Extended => Ok(CanFdFrame {
                     frame: pcan::TPCANMsgFD {
-                        ID: can_id & STANDARD_MASK,
-                        MSGTYPE: pcan::PCAN_MESSAGE_STANDARD as u8,
+                        ID: can_id & EXTENDED_MASK,
+                        MSGTYPE: pcan::PCAN_MESSAGE_EXTENDED as u8,
                         DLC: data.len() as u8,
                         DATA: frame_data,
                     },
@@ -511,6 +512,28 @@ mod tests {
             CanFrame::new(0x20, MessageType::Extended, &[0, 1, 2, 3, 4, 5, 6, 7, 8]).unwrap();
     }
 
+    #[test]
+    fn can_frame_new_005() {
+        let extended_id = 0x1E_C5_7E_D0;
+        // Extended id bitwise and with standard mask
+        let standard_id = 0x06_D0;
+
+        let can_frame_1 = CanFrame::new(extended_id, MessageType::Standard, &[0, 1, 2]).unwrap();
+        assert_eq!(can_frame_1.can_id(), standard_id);
+
+        let can_frame_2 = CanFrame::new(extended_id, MessageType::Extended, &[0, 1, 2]).unwrap();
+        assert_eq!(can_frame_2.can_id(), extended_id);
+    }
+
+    #[test]
+    fn can_frame_new_006() {
+        let can_frame_1 = CanFrame::new(0x01_23, MessageType::Standard, &[0, 1, 2]).unwrap();
+        assert!(can_frame_1.is_standard_frame());
+
+        let can_frame_2 = CanFrame::new(0x1f_ff_00_ff, MessageType::Extended, &[0, 1, 2]).unwrap();
+        assert!(can_frame_2.is_extended_frame());
+    }
+
     /* CAN FD FRAME */
 
     #[test]
@@ -547,5 +570,29 @@ mod tests {
     fn can_fd_frame_new_004() {
         let _can_frame_1 =
             CanFrame::new(0x20, MessageType::Extended, &(0..65u8).collect::<Vec<_>>()).unwrap();
+    }
+
+    #[test]
+    fn can_fd_frame_new_005() {
+        let extended_id = 0x1E_C5_7E_D0;
+        // Extended id bitwise and with standard mask
+        let standard_id = 0x06_D0;
+
+        let can_frame_1 = CanFdFrame::new(
+            extended_id,
+            MessageType::Standard,
+            &(0..64u8).collect::<Vec<_>>(),
+        )
+        .unwrap();
+        assert_eq!(can_frame_1.can_id(), standard_id);
+
+        let can_frame_2 = CanFdFrame::new(
+            extended_id,
+            MessageType::Extended,
+            &(0..64u8).collect::<Vec<_>>(),
+        )
+        .unwrap();
+
+        assert_eq!(can_frame_2.can_id(), extended_id);
     }
 }
