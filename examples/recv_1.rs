@@ -4,7 +4,7 @@ use pcan_basic::socket::Baudrate;
 use pcan_basic::socket::RecvCan;
 
 fn main() {
-    let usb_socket = match UsbCanSocket::open(UsbBus::USB1, Baudrate::Baud500K) {
+    let usb_socket = match UsbCanSocket::open(UsbBus::USB1, Baudrate::Baud250K) {
         Ok(socket) => socket,
         Err(err) => {
             println!("{:?}", err);

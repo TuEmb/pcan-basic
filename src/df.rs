@@ -389,7 +389,7 @@ impl<T: HasAllowEchoFrames + Channel> AllowEchoFrames for T {
         let code = unsafe {
             pcan::CAN_GetValue(
                 self.channel(),
-                pcan::PCAN_ALLOW_ECHO_FRAMES as u8,
+                pcan::PCAN_ALLOW_ERROR_FRAMES as u8,
                 data.as_mut_ptr() as *mut c_void,
                 data.len() as u32,
             )
@@ -427,7 +427,7 @@ impl<T: HasSetAllowEchoFrames + Channel> SetAllowEchoFrames for T {
         let code = unsafe {
             pcan::CAN_SetValue(
                 self.channel(),
-                pcan::PCAN_ALLOW_ECHO_FRAMES as u8,
+                pcan::PCAN_ALLOW_ERROR_FRAMES as u8,
                 data.as_mut_ptr() as *mut c_void,
                 data.len() as u32,
             )

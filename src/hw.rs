@@ -413,7 +413,7 @@ impl<T: HasDevicePartNumber + Channel> DevicePartNumber for T {
         let code = unsafe {
             pcan::CAN_GetValue(
                 self.channel(),
-                pcan::PCAN_DEVICE_PART_NUMBER as u8,
+                pcan::PCAN_DEVICE_NUMBER as u8,
                 data.as_mut_ptr() as *mut c_void,
                 data.len() as u32,
             )
