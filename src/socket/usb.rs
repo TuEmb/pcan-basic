@@ -51,6 +51,12 @@ impl UsbCanSocket {
             Err(_) => Err(PcanError::Unknown),
         }
     }
+
+    pub fn open_with_usb_bus(bus: UsbBus) -> UsbCanSocket {
+        let handle = bus.into();
+        UsbCanSocket { handle }
+    }
+
 }
 
 /* Drop trait implementation */
