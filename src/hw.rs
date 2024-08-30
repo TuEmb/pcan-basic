@@ -340,7 +340,7 @@ pub fn attached_channels_count() -> Result<u32, PcanError> {
 
 #[derive(Debug)]
 pub struct ChannelInformation {
-    channel_information: pcan::tagTPCANChannelInformation,
+    pub channel_information: pcan::tagTPCANChannelInformation,
 }
 
 impl ChannelInformation {
